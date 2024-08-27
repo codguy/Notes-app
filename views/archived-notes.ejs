@@ -1,0 +1,41 @@
+<div class="container mx-auto px-4">
+  <h2 class="text-2xl font-bold mb-4">Archived Notes</h2>
+  <% if (archived && archived.length > 0) { %>
+  <ul class="space-y-2">
+    <% archived.forEach(function(note) { %>
+      <li class="flex items-center justify-between bg-gray-800 p-3 rounded-lg">
+        <span class="text-lg"><%= note.title %></span>
+        <button onclick="unarchiveNote('<%= note.id %>')" class="text-blue-400 hover:text-green-300" title="Unarchive this note">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            </svg>
+        </button>
+
+
+      </li>
+    <% }); %>
+  </ul>
+  <% } else { %>
+    <div class="text-center py-10">
+      <p class="text-sm text-gray-500">No Archived note!</p>
+    </div>
+  <% } %>
+</div>
+
+<script>
+  function unarchiveNote(id) {
+    fetch(`/unarchive/${id}`, { method: 'POST' })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert('Failed to unarchive note');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while unarchiving the note');
+      });
+  }
+</script>

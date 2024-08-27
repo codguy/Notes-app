@@ -1,0 +1,157 @@
+<div class="text-center bg-gray-900 text-white mt-20 mb-20">
+  <h1 class="text-3xl font-bold mb-4">Welcome to the Notes App</h1>
+  <p class="mb-8">Organize your thoughts and ideas effortlessly.</p>
+</div>
+
+<!-- Add this search bar -->
+<div class="max-w-xl mx-auto mb-8">
+  <div class="relative">
+    <input type="text" id="searchInput" placeholder="Search notes..." class="w-full py-2 px-4 bg-gray-800 text-white rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-500">
+    <button id="searchButton" class="absolute right-0 top-0 mt-2 mr-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+<div id="notesList" class="mt-4">
+  <%- include('notes.ejs', {notes: notes}) %>
+</div>
+
+<!-- Modal -->
+<div id="createNoteModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog"
+  aria-modal="true">
+  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">​</span>
+    <div
+      class="inline-block align-bottom bg-gray-900 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <button id="closeModal" class="absolute top-0 right-0 mt-4 mr-4 text-gray-400 hover:text-white">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <div class="bg-gray-900 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <%- include('create.ejs') %>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="archiveList" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog"
+  aria-modal="true">
+  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">​</span>
+    <div
+      class="inline-block align-bottom bg-gray-900 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <button id="closeArchiveList" class="absolute top-0 right-0 mt-4 mr-4 text-gray-400 hover:text-white">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <div class="bg-gray-900 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <%- include('archived-notes.ejs', {archived: archived}) %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button id="archiveButton" class="fixed bottom-24 right-10 bg-gray-600 hover:bg-gray-700 text-white font-bold p-3 rounded-full shadow-lg">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+  </svg>
+</button>
+
+<button href="" id="openCreateModal"
+  class="fixed bottom-8 right-8 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold p-4 rounded-full shadow-lg">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+  </svg>
+</button>
+<script>
+  const modal = document.getElementById('createNoteModal');
+  const openButton = document.getElementById('openCreateModal');
+  const closeButton = document.getElementById('closeModal');
+  const archiveButton = document.getElementById('archiveButton');
+  const archiveList = document.getElementById('archiveList');
+  const closeArchiveList = document.getElementById('closeArchiveList');
+
+  // Add this search functionality
+  const searchInput = document.getElementById('searchInput');
+  const searchButton = document.getElementById('searchButton');
+  const notesList = document.getElementById('notesList');
+
+  openButton.addEventListener('click', () => {
+    document.querySelector('form').attributes.action.value = '/create';
+    document.querySelector('form').reset();
+    modal.classList.remove('hidden');
+  });
+
+  archiveButton.addEventListener('click', () => {
+    archiveList.classList.remove('hidden');
+  });
+
+  closeButton.addEventListener('click', () => {
+    modal.classList.add('hidden');
+  });
+
+  closeArchiveList.addEventListener('click', () => {
+    archiveList.classList.add('hidden');
+  });
+
+  function deleteNote(noteId) {
+    if (confirm('Are you sure you want to delete this note?')) {
+      fetch(`/delete/${noteId}`, { method: 'DELETE' })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            location.reload();
+          } else {
+            alert('Failed to delete note');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while deleting the note');
+        });
+    }
+  }
+
+  function performSearch() {
+    const searchTerm = searchInput.value.toLowerCase();
+    fetch(`/search?term=${encodeURIComponent(searchTerm)}`)
+      .then(response => response.text())
+      .then(html => {
+        notesList.innerHTML = html;
+        highlightSearchTerm(searchTerm);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while searching');
+      });
+  }
+
+  function highlightSearchTerm(term) {
+    if (!term) return;
+    const regex = new RegExp(term, 'gi');
+    const elements = notesList.querySelectorAll('.note-title, .note-content');
+    elements.forEach(element => {
+      element.innerHTML = element.textContent.replace(regex, match => `<mark class="highlight">${match}</mark>`);
+    });
+  }
+
+  searchButton.addEventListener('click', performSearch);
+  searchInput.addEventListener('input', (e) => {
+    setTimeout(performSearch, 500);
+  });
+
+</script>
+
+<style>
+  .highlight {
+    background-color: rgb(234, 179, 8);
+    padding: 2px;
+    border-radius: 2px;
+  }
+</style>

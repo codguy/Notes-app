@@ -1,0 +1,126 @@
+<%
+  function getContentSize(note) {
+    return JSON.stringify(note).length;
+  }
+
+  function sizeOfColumn(column){
+    let size = 0;
+    column.forEach(note => {
+      size += note.content.length;
+    });
+    return size;
+  }
+
+  const sortedNotes = notes.sort((a, b) => getContentSize(b) - getContentSize(a));
+  const totalSize = sortedNotes.reduce((sum, note) => sum + getContentSize(note), 0);
+  const targetSize = totalSize / 3;
+
+  const column1 = [], column2 = [], column3 = [];
+  let currentSize = 0;
+
+  sortedNotes.forEach(note => {
+    if((sizeOfColumn(column1) <= sizeOfColumn(column2)) && (sizeOfColumn(column1) <= sizeOfColumn(column3))){
+      column1.push(note);
+    } else if((sizeOfColumn(column2) <= sizeOfColumn(column1)) && (sizeOfColumn(column2) <= sizeOfColumn(column3))) {
+      column2.push(note);
+    } else {
+      column3.push(note);
+    }
+  });
+%>
+  <section tabindex="-1" class="relative max-w-7xl mx-auto px-4 focus:outline-none sm:px-3 md:px-5">
+    <% if (notes && notes.length > 0) { %>
+      <div class="grid grid-cols-1 gap-6 lg:gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <% [column1, column2, column3].forEach(column => { %>
+          <ul class="space-y-8">
+            <% column.sort((a, b) => b.id - a.id); %>
+            <% column.forEach(function(note) { %>
+              <div class="bg-gray-800 shadow-md rounded px-8 pt-6 pb-8 mb-4 relative">
+                <h3 class="text-xl font-bold text-white note-title"><%= note.title %></h3>
+                <p class="text-gray-300 text-base note-content"><%= note.content %></p>
+                <div class="absolute top-2 right-2 flex space-x-2">
+                  <button class="text-blue-400 hover:text-blue-300" onclick='editNote(`<%= note.id %>`)'>
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button class="text-red-400 hover:text-red-300" onclick="deleteNote('<%= note.id %>')">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                  <button class="text-green-400 hover:text-yellow-300" onclick="archiveNote('<%= note.id %>')">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            <% }); %>
+          </ul>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="text-center py-10">
+        <p class="text-xl text-gray-500">No notes available.</p>
+      </div>
+    <% } %>
+  </section>
+<a
+    href="/create"
+    class="fixed bottom-8 right-8 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold p-4 rounded-full shadow-lg"
+>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+    >
+        <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+        />
+    </svg>
+</a>
+<script>
+  const showMoreButton = document.getElementById('show-more-button');
+  const showMoreButtonContainer = document.getElementById('show-more-button-container');
+  const notesGridHidden = document.getElementById('notes-grid-hidden');
+
+  showMoreButton.addEventListener('click', () => {
+    notesGridHidden.classList.remove('max-h-[44rem]');
+    showMoreButtonContainer.classList.add('invisible');
+  });
+  
+  function editNote(id) {
+    let notes = '<%-JSON.stringify(notes)%>';
+    notes = notes.replace(/[\u0000-\u001F]+/g, "");
+    notes = JSON.parse(notes);
+    let note = notes.find(note => note.id == id);
+    if(note) {
+      document.querySelector('form').attributes.action.value = '/update/'+id;
+      modal.classList.remove('hidden');
+      document.querySelector('form input[name="title"]').value = note.title;
+      document.querySelector('form textarea#content').value = note.content;
+    }
+  }
+
+  function archiveNote(id){
+    fetch(`/archive/${id}`, { method: 'POST' })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert('Failed to delete note');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting the note');
+      });
+  }
+</script>
