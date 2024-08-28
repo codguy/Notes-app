@@ -36,16 +36,22 @@ The app provides a seamless experience for keeping track of your thoughts, ideas
 1. Clone the repository:
 ~~~bash
 git clone https://github.com/yourusername/notes-app.git 
-cd notes-app
 ~~~
 
 
 2. Install dependencies:
 ~~~bash
+cd notes-app
+npm install 
+~~~
+
+
+3. Run the application:
+~~~bash
 node server.js
 ~~~
 
-3. Open your web browser and navigate to `http://localhost:3000`
+4. Open your web browser and navigate to `http://localhost:3000`
 
 ## API Endpoints
 
