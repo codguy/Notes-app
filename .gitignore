@@ -1,2 +1,4 @@
 node_modules
+data/
+archived/
 eslint.config.mjs
