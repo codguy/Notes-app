@@ -18,6 +18,8 @@ Key features include:
 
 The app provides a seamless experience for keeping track of your thoughts, ideas, and important information. Whether you're a student, professional, or anyone who likes to stay organized, this Notes App is designed to meet your note-taking needs.
 
+You can access the live application at [https://notes-app-819b.onrender.com/](https://notes-app-819b.onrender.com/).
+
 
 ## Features
 
