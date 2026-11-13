@@ -1,21 +1,68 @@
 <%
   const chip = 'tag-chip rounded-full border px-3 py-1 text-sm font-semibold transition-colors';
-  const chipOn = 'border-ink bg-ink text-white';
-  const chipOff = 'border-slate-300 bg-white/70 text-ink hover:border-pen hover:text-pen';
+  const chipOn = 'border-ink bg-ink text-desk';
+  const chipOff = 'border-line bg-surface/70 text-ink hover:border-pen hover:text-pen';
   const segment = 'view-btn inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold';
+  const themes = [
+    { id: 'auto', name: 'Match my device', hint: 'Light or dark, following your device' },
+    { id: 'light', name: 'Light', hint: 'Cool grey desk, pastel cards' },
+    { id: 'dark', name: 'Dark', hint: 'Easy on the eyes at night' },
+    { id: 'notebook', name: 'Notebook', hint: 'Lined pages on a kraft cover' },
+    { id: 'retro', name: 'Retro', hint: 'Warm 70s colours, bold outlines' },
+    { id: 'terminal', name: 'Terminal', hint: 'Green glow on a black screen' },
+    { id: 'blueprint', name: 'Blueprint', hint: 'White lines on drafting blue' },
+    { id: 'paperback', name: 'Paperback', hint: 'Soft sepia, like an old book' },
+  ];
 %>
 <header class="max-w-6xl mx-auto px-5 pt-8 sm:pt-12">
   <div class="flex items-center justify-between gap-4">
     <a href="/" class="flex items-center gap-2.5">
-      <span class="grid h-9 w-9 place-items-center rounded-lg bg-ink text-white font-display font-extrabold text-lg rotate-[-4deg]">N</span>
+      <span class="grid h-9 w-9 place-items-center rounded-lg bg-ink text-desk font-display font-extrabold text-lg rotate-[-4deg]">N</span>
       <span class="font-display text-xl font-bold tracking-tight">Notes</span>
     </a>
-    <button type="button" id="archiveButton"
-      class="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white/70 px-4 py-2 text-sm font-semibold hover:border-pen hover:text-pen">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
-      Archive
-      <span class="rounded-full bg-ink px-2 py-0.5 font-mono text-[11px] text-white"><%= counts.archived %></span>
-    </button>
+    <div class="flex items-center gap-2">
+      <!-- Theme picker -->
+      <div class="relative" id="themePicker">
+        <button type="button" id="themeButton" aria-haspopup="true" aria-expanded="false" aria-controls="themeMenu" aria-label="Change theme"
+          class="inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 px-3 sm:px-4 py-2 text-sm font-semibold hover:border-pen hover:text-pen">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
+          <span class="hidden sm:inline">Theme</span>
+        </button>
+        <div id="themeMenu" role="radiogroup" aria-label="Theme"
+          class="hidden fixed inset-x-4 top-20 z-40 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-2xl border border-line bg-surface p-2 shadow-2xl sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[19rem]">
+          <% themes.forEach(function(theme) { %>
+            <button type="button" role="radio" aria-checked="false" data-pick-theme="<%= theme.id %>" tabindex="-1"
+              class="theme-option flex w-full items-center gap-3 rounded-xl p-2 text-left hover:bg-desk focus-visible:bg-desk">
+              <% if (theme.id === 'auto') { %>
+                <span class="relative h-12 w-16 shrink-0 overflow-hidden rounded-lg border border-line" aria-hidden="true">
+                  <span class="theme-preview absolute inset-y-0 left-0 w-1/2" data-theme="light"><span class="mini-card tint-butter" style="left: 7px; top: 12px; transform: rotate(-6deg)"></span></span>
+                  <span class="theme-preview absolute inset-y-0 right-0 w-1/2" data-theme="dark"><span class="mini-card tint-sky" style="left: 7px; top: 14px; transform: rotate(5deg)"></span></span>
+                </span>
+              <% } else { %>
+                <span class="theme-preview relative h-12 w-16 shrink-0 overflow-hidden rounded-lg border border-line" data-theme="<%= theme.id %>" aria-hidden="true">
+                  <span class="mini-card tint-butter" style="left: 6px; top: 7px; transform: rotate(-6deg)"></span>
+                  <span class="mini-card tint-sky" style="left: 18px; top: 19px; transform: rotate(5deg)"></span>
+                  <span class="mini-text absolute right-1.5 top-1 text-[15px] font-bold leading-none">Aa</span>
+                  <span class="mini-pen absolute bottom-1.5 right-1.5 h-1.5 w-5 rounded-full"></span>
+                </span>
+              <% } %>
+              <span class="min-w-0 flex-1">
+                <span class="block text-sm font-semibold"><%= theme.name %></span>
+                <span class="block text-xs text-slate"><%= theme.hint %></span>
+              </span>
+              <svg class="theme-check h-5 w-5 shrink-0 text-pen invisible" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+            </button>
+          <% }); %>
+        </div>
+      </div>
+
+      <button type="button" id="archiveButton"
+        class="inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 px-4 py-2 text-sm font-semibold hover:border-pen hover:text-pen">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
+        Archive
+        <span class="rounded-full bg-ink px-2 py-0.5 font-mono text-[11px] text-desk"><%= counts.archived %></span>
+      </button>
+    </div>
   </div>
 
   <div class="mt-12 sm:mt-16 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
@@ -29,27 +76,27 @@
       <label for="searchInput" class="sr-only">Search notes</label>
       <svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
       <input type="search" id="searchInput" placeholder="Search titles, text and tags" autocomplete="off" value="<%= searchTerm %>"
-        class="w-full rounded-full border border-slate-300 bg-white py-3 pl-11 pr-14 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-pen focus:border-transparent">
-      <kbd class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 rounded border border-slate-300 px-1.5 font-mono text-[11px] text-slate">/</kbd>
+        class="w-full rounded-full border border-line bg-surface py-3 pl-11 pr-14 placeholder-slate/60 focus:outline-none focus:ring-2 focus:ring-pen focus:border-transparent">
+      <kbd class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 rounded border border-line px-1.5 font-mono text-[11px] text-slate">/</kbd>
     </div>
   </div>
 
   <!-- View, sort and archive controls -->
   <div class="mt-8 flex flex-wrap items-center gap-3">
-    <div role="group" aria-label="View" class="inline-flex rounded-full border border-slate-300 bg-white/70 p-1">
+    <div role="group" aria-label="View" class="inline-flex rounded-full border border-line bg-surface/70 p-1">
       <button type="button" data-view="board" aria-pressed="<%= prefs.view === 'board' %>"
-        class="<%= segment %> <%= prefs.view === 'board' ? 'bg-ink text-white' : 'text-ink hover:text-pen' %>">
+        class="<%= segment %> <%= prefs.view === 'board' ? 'bg-ink text-desk' : 'text-ink hover:text-pen' %>">
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5h6v6H4zM14 5h6v4h-6zM14 13h6v6h-6zM4 15h6v4H4z" /></svg>
         Board
       </button>
       <button type="button" data-view="timeline" aria-pressed="<%= prefs.view === 'timeline' %>"
-        class="<%= segment %> <%= prefs.view === 'timeline' ? 'bg-ink text-white' : 'text-ink hover:text-pen' %>">
+        class="<%= segment %> <%= prefs.view === 'timeline' ? 'bg-ink text-desk' : 'text-ink hover:text-pen' %>">
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 3v18M6 7h.01M6 12h.01M6 17h.01M10 7h10M10 12h7M10 17h9" /></svg>
         Timeline
       </button>
     </div>
 
-    <label id="sortControl" class="<%= prefs.view === 'timeline' ? 'hidden' : 'inline-flex' %> items-center gap-2 rounded-full border border-slate-300 bg-white/70 py-1 pl-4 pr-2 text-sm font-semibold">
+    <label id="sortControl" class="<%= prefs.view === 'timeline' ? 'hidden' : 'inline-flex' %> items-center gap-2 rounded-full border border-line bg-surface/70 py-1 pl-4 pr-2 text-sm font-semibold">
       Sort
       <select id="sortSelect" class="rounded-full bg-transparent py-1 pr-1 font-semibold text-pen focus:outline-none">
         <option value="newest" <%= prefs.sort === 'newest' ? 'selected' : '' %>>Newest first</option>
@@ -59,9 +106,9 @@
       </select>
     </label>
 
-    <label class="inline-flex cursor-pointer items-center gap-2.5 rounded-full border border-slate-300 bg-white/70 py-1.5 pl-2 pr-4 text-sm font-semibold">
+    <label class="inline-flex cursor-pointer items-center gap-2.5 rounded-full border border-line bg-surface/70 py-1.5 pl-2 pr-4 text-sm font-semibold">
       <input type="checkbox" id="showArchived" class="peer sr-only" <%= prefs.showArchived ? 'checked' : '' %>>
-      <span class="relative h-5 w-9 rounded-full bg-slate-400 transition-colors peer-checked:bg-pen after:absolute after:content-[''] after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4 peer-focus-visible:ring-2 peer-focus-visible:ring-pen"></span>
+      <span class="relative h-5 w-9 rounded-full bg-slate/40 transition-colors peer-checked:bg-pen after:absolute after:content-[''] after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4 peer-focus-visible:ring-2 peer-focus-visible:ring-pen"></span>
       Include archived
     </label>
   </div>
@@ -86,9 +133,9 @@
 
 <!-- New / edit note dialog -->
 <div id="createNoteModal" class="fixed z-30 inset-0 hidden overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="noteFormHeading">
-  <div class="fixed inset-0 bg-ink/40 backdrop-blur-sm" data-close-modal></div>
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" data-close-modal></div>
   <div class="relative mx-auto my-[6vh] w-[calc(100%-2rem)] max-w-lg rounded-2xl bg-desk p-6 sm:p-8 shadow-2xl">
-    <button type="button" data-close-modal aria-label="Close" class="absolute top-4 right-4 p-1.5 rounded-md text-slate hover:text-ink hover:bg-white">
+    <button type="button" data-close-modal aria-label="Close" class="absolute top-4 right-4 p-1.5 rounded-md text-slate hover:text-ink hover:bg-surface">
       <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
     </button>
     <%- include('create.ejs') %>
@@ -97,14 +144,14 @@
 
 <!-- Archive drawer -->
 <div id="archiveList" class="fixed z-30 inset-0 hidden" role="dialog" aria-modal="true" aria-labelledby="archiveHeading">
-  <div class="absolute inset-0 bg-ink/40 backdrop-blur-sm" data-close-archive></div>
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" data-close-archive></div>
   <aside class="drawer absolute right-0 top-0 h-full w-full max-w-md translate-x-full overflow-y-auto bg-desk p-6 sm:p-8 shadow-2xl">
     <div class="flex items-center justify-between mb-6">
       <div>
         <h2 id="archiveHeading" class="font-display text-2xl font-bold">Archive</h2>
         <p class="text-sm text-slate">Notes you've put away. Restore one to bring it back to your board.</p>
       </div>
-      <button type="button" data-close-archive aria-label="Close archive" class="self-start p-1.5 rounded-md text-slate hover:text-ink hover:bg-white">
+      <button type="button" data-close-archive aria-label="Close archive" class="self-start p-1.5 rounded-md text-slate hover:text-ink hover:bg-surface">
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
@@ -113,15 +160,15 @@
 </div>
 
 <button type="button" id="openCreateModal"
-  class="fixed z-20 bottom-6 right-6 sm:bottom-8 sm:right-8 inline-flex items-center gap-2 rounded-full bg-pen px-5 py-3.5 font-semibold text-white shadow-lg shadow-blue-900/25 hover:bg-blue-700">
+  class="fixed z-20 bottom-6 right-6 sm:bottom-8 sm:right-8 inline-flex items-center gap-2 rounded-full bg-pen px-5 py-3.5 font-semibold text-on-pen shadow-lg shadow-black/25 hover:bg-pen/85">
   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
   New note
 </button>
 
 <div id="toast" role="status" aria-live="polite"
-  class="toast pointer-events-none fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 translate-y-2 items-center gap-4 rounded-full bg-ink py-2.5 pl-5 pr-3 text-sm font-semibold text-white opacity-0 shadow-lg">
+  class="toast pointer-events-none fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 translate-y-2 items-center gap-4 rounded-full bg-ink py-2.5 pl-5 pr-3 text-sm font-semibold text-desk opacity-0 shadow-lg">
   <span id="toastMessage"></span>
-  <button type="button" id="toastAction" class="hidden rounded-full px-3 py-1 font-bold text-[#9DB8FF] hover:bg-white/10"></button>
+  <button type="button" id="toastAction" class="hidden rounded-full px-3 py-1 font-bold text-desk underline underline-offset-2 hover:bg-desk/15"></button>
 </div>
 
 <script>
@@ -352,10 +399,10 @@
     document.querySelectorAll('.tag-chip').forEach(chip => {
       const on = chip.dataset.tag === state.tag;
       chip.classList.toggle('bg-ink', on);
-      chip.classList.toggle('text-white', on);
+      chip.classList.toggle('text-desk', on);
       chip.classList.toggle('border-ink', on);
-      chip.classList.toggle('bg-white/70', !on);
-      chip.classList.toggle('border-slate-300', !on);
+      chip.classList.toggle('bg-surface/70', !on);
+      chip.classList.toggle('border-line', !on);
     });
     refreshNotes();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -370,7 +417,7 @@
       const on = button.dataset.view === view;
       button.setAttribute('aria-pressed', on);
       button.classList.toggle('bg-ink', on);
-      button.classList.toggle('text-white', on);
+      button.classList.toggle('text-desk', on);
       button.classList.toggle('text-ink', !on);
     });
     document.getElementById('pageHeading').textContent = view === 'timeline' ? 'Your timeline' : 'Your board';
@@ -394,11 +441,70 @@
     location.reload();
   });
 
+  // ---- Themes ----
+  // The chosen theme is applied before the page draws (see the layout); this handles switching.
+  const themeButton = document.getElementById('themeButton');
+  const themeMenu = document.getElementById('themeMenu');
+  const themeOptions = [...themeMenu.querySelectorAll('[data-pick-theme]')];
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function applyTheme(choice) {
+    const root = document.documentElement;
+    root.dataset.themeChoice = choice;
+    root.dataset.theme = choice === 'auto' ? (prefersDark.matches ? 'dark' : 'light') : choice;
+    themeOptions.forEach(option => {
+      const on = option.dataset.pickTheme === choice;
+      option.setAttribute('aria-checked', on);
+      option.tabIndex = on ? 0 : -1;
+      option.querySelector('.theme-check').classList.toggle('invisible', !on);
+    });
+  }
+  function chooseTheme(choice) {
+    setPref('theme', choice);
+    applyTheme(choice);
+  }
+  function openThemeMenu() {
+    themeMenu.classList.remove('hidden');
+    themeButton.setAttribute('aria-expanded', 'true');
+    (themeOptions.find(o => o.getAttribute('aria-checked') === 'true') || themeOptions[0]).focus();
+  }
+  function closeThemeMenu(returnFocus) {
+    themeMenu.classList.add('hidden');
+    themeButton.setAttribute('aria-expanded', 'false');
+    if (returnFocus) themeButton.focus();
+  }
+  const themeMenuOpen = () => !themeMenu.classList.contains('hidden');
+
+  applyTheme(document.documentElement.dataset.themeChoice || 'auto');
+  // "Match my device" follows the device if it switches between light and dark
+  prefersDark.addEventListener('change', () => {
+    if (document.documentElement.dataset.themeChoice === 'auto') applyTheme('auto');
+  });
+
+  themeButton.addEventListener('click', () => (themeMenuOpen() ? closeThemeMenu() : openThemeMenu()));
+  // The menu stays open after picking, so themes are easy to compare
+  themeOptions.forEach(option => option.addEventListener('click', () => chooseTheme(option.dataset.pickTheme)));
+  themeMenu.addEventListener('keydown', (e) => {
+    const index = themeOptions.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const next = themeOptions[(index + (e.key === 'ArrowDown' ? 1 : -1) + themeOptions.length) % themeOptions.length];
+      next.focus();
+      chooseTheme(next.dataset.pickTheme);
+    } else if (e.key === 'Tab') {
+      closeThemeMenu();
+    }
+  });
+  document.addEventListener('click', (e) => {
+    if (themeMenuOpen() && !document.getElementById('themePicker').contains(e.target)) closeThemeMenu();
+  });
+
   // ---- Keyboard shortcuts ----
   document.addEventListener('keydown', (e) => {
     const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
     if (e.key === 'Escape') {
-      if (!modal.classList.contains('hidden')) closeModal();
+      if (themeMenuOpen()) closeThemeMenu(true);
+      else if (!modal.classList.contains('hidden')) closeModal();
       else if (!archiveList.classList.contains('hidden')) closeArchive();
       else if (document.activeElement === searchInput && searchInput.value) {
         searchInput.value = '';
@@ -407,7 +513,7 @@
       }
       return;
     }
-    if (typing || e.ctrlKey || e.metaKey || e.altKey || !modal.classList.contains('hidden')) return;
+    if (typing || e.ctrlKey || e.metaKey || e.altKey || !modal.classList.contains('hidden') || themeMenuOpen()) return;
     if (e.key === '/') {
       e.preventDefault();
       searchInput.focus();

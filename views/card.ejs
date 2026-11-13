@@ -5,7 +5,7 @@
   const lines = h.noteLines(note.content);
   const progress = h.checklistProgress(note.content);
   const tags = note.tags || [];
-  const iconBtn = 'p-1.5 rounded-md text-slate hover:bg-white/70';
+  const iconBtn = 'p-1.5 rounded-md text-slate hover:bg-surface/70';
 %>
 <article
   class="note-card tint-<%= h.tintFor(note) %> relative rounded-xl px-6 pt-5 pb-5<%= note.archived ? ' is-archived' : '' %>"
@@ -16,7 +16,7 @@
   data-color="<%= h.tintFor(note) %>"
   data-tags="<%= tags.join(', ') %>"
 >
-  <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2 min-h-[18px] pr-28 whitespace-nowrap font-mono text-[11px] uppercase tracking-wider text-slate">
+  <div class="card-meta flex flex-wrap items-center gap-x-3 gap-y-1 mb-2 min-h-[18px] pr-28 whitespace-nowrap font-mono text-[11px] uppercase tracking-wider text-slate">
     <% if (variant === 'board') { %><span><%= h.formatDate(note.id, tz) %></span><% } %>
     <% if (note.pinned && !note.archived) { %>
       <span class="inline-flex items-center gap-1 text-pen" title="Pinned">
@@ -28,29 +28,29 @@
     <% if (progress.total) { %><span title="Checklist progress"><%= progress.done %>/<%= progress.total %> done</span><% } %>
   </div>
 
-  <h3 class="hl font-display font-bold text-xl leading-snug"><%= note.title %></h3>
+  <h3 class="card-title hl font-display font-bold text-xl leading-snug"><%= note.title %></h3>
 
-  <div class="mt-2 text-[15px] leading-relaxed text-ink/80">
+  <div class="card-body mt-2 text-[15px] leading-relaxed text-ink/80">
     <% lines.forEach(function(line) { %>
       <% if (line.type === 'check') { %>
         <label class="check-line flex items-start gap-2.5 py-0.5 cursor-pointer">
-          <input type="checkbox" class="mt-1 h-4 w-4 shrink-0 rounded accent-[#2F5BEA]" <%= line.checked ? 'checked' : '' %>
+          <input type="checkbox" class="mt-1 h-4 w-4 shrink-0 rounded accent-pen" <%= line.checked ? 'checked' : '' %>
             onchange="toggleItem('<%= note.id %>', <%= line.index %>, this)">
           <span class="hl<%= line.checked ? ' line-through text-slate' : '' %>"><%= line.text %></span>
         </label>
       <% } else if (line.type === 'text') { %>
         <p class="hl break-words"><%= line.text %></p>
       <% } else { %>
-        <div class="h-3"></div>
+        <div class="blank-line h-3"></div>
       <% } %>
     <% }); %>
   </div>
 
   <% if (tags.length || (variant === 'board' && h.wasEdited(note))) { %>
-    <div class="mt-4 flex flex-wrap items-center gap-1.5">
+    <div class="card-foot mt-4 flex flex-wrap items-center gap-1.5">
       <% tags.forEach(function(tag) { %>
         <button type="button" data-tag="<%= tag %>" onclick="filterTag(this.dataset.tag)"
-          class="rounded-full bg-white/60 px-2.5 py-0.5 text-xs font-semibold text-ink/70 hover:bg-white hover:text-pen">#<%= tag %></button>
+          class="rounded-full bg-surface/60 px-2.5 py-0.5 text-xs font-semibold text-ink/70 hover:bg-surface hover:text-pen">#<%= tag %></button>
       <% }); %>
       <% if (variant === 'board' && h.wasEdited(note)) { %>
         <span class="ml-auto font-mono text-[11px] text-slate">Edited <%= h.timeAgo(note.updatedAt, now) %></span>

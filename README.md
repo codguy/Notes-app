@@ -32,6 +32,7 @@ You can access the live application at [https://notes-app-819b.onrender.com/](ht
 - Sort by newest, oldest, recently edited or A to Z
 - Archive and unarchive notes, optionally including archived notes in search and views
 - Search across titles, text and tags with highlighted matches
+- Themes: Match my device (default), Light, Dark, Notebook, Retro, Terminal, Blueprint and Paperback — pick one from the Theme menu; the choice is remembered
 - Keyboard shortcuts: `N` new note, `/` search, `B` board, `T` timeline, `Esc` close
 
 ## Prerequisites

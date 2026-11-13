@@ -37,7 +37,7 @@
                 <span class="block"><%= h.formatTime(note.id, tz) %></span>
               </div>
               <div class="relative pl-6">
-                <span class="timeline-dot" style="--dot: <%= h.tintHex(note) %>" aria-hidden="true"></span>
+                <span class="timeline-dot tint-<%= h.tintFor(note) %>" aria-hidden="true"></span>
                 <%- include('card.ejs', { note: note, variant: 'timeline', tilt: '0deg' }) %>
                 <% if (h.wasEdited(note)) { %>
                   <p class="mt-2 flex items-center gap-1.5 font-mono text-[11px] text-slate">
