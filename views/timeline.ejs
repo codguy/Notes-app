@@ -1,0 +1,56 @@
+<%
+  // Timeline view: notes placed on the day they were written, newest at the top.
+  const tz = prefs.tzOffset;
+  const groups = h.timelineGroups(notes, now, tz);
+%>
+<div class="lg:grid lg:grid-cols-[10rem_1fr] lg:gap-10">
+  <!-- Jump to a time period -->
+  <nav aria-label="Jump to" class="hidden lg:block">
+    <div class="sticky top-6">
+      <p class="mb-3 font-mono text-[11px] uppercase tracking-wider text-slate">Jump to</p>
+      <ul class="space-y-1 border-l border-ink/10">
+        <% groups.forEach(function(group) { %>
+          <li>
+            <a href="#<%= group.anchor %>" class="-ml-px block border-l-2 border-transparent py-1 pl-3 text-sm font-semibold text-slate hover:border-pen hover:text-pen">
+              <%= group.label %>
+              <span class="ml-1 font-mono text-[11px] font-normal text-ink/40"><%= group.notes.length %></span>
+            </a>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="timeline relative">
+    <% groups.forEach(function(group) { %>
+      <section id="<%= group.anchor %>" class="scroll-mt-6 pb-8">
+        <h2 class="sticky top-0 z-[5] mb-5 flex items-baseline gap-3 bg-desk/90 py-1 pl-[5.5rem] sm:pl-[7.5rem] font-display text-2xl font-bold backdrop-blur-sm">
+          <%= group.label %>
+          <span class="font-mono text-xs font-normal text-slate"><%= group.notes.length %> <%= group.notes.length === 1 ? 'note' : 'notes' %></span>
+        </h2>
+
+        <ol class="space-y-6">
+          <% group.notes.forEach(function(note) { %>
+            <li class="relative grid grid-cols-[4.5rem_1fr] sm:grid-cols-[6.5rem_1fr] gap-4 sm:gap-4">
+              <div class="pt-5 text-right font-mono text-[11px] leading-tight text-slate">
+                <% if (!group.recent) { %><span class="block font-medium text-ink"><%= h.formatDate(note.id, tz, false) %></span><% } %>
+                <span class="block"><%= h.formatTime(note.id, tz) %></span>
+              </div>
+              <div class="relative pl-6">
+                <span class="timeline-dot" style="--dot: <%= h.tintHex(note) %>" aria-hidden="true"></span>
+                <%- include('card.ejs', { note: note, variant: 'timeline', tilt: '0deg' }) %>
+                <% if (h.wasEdited(note)) { %>
+                  <p class="mt-2 flex items-center gap-1.5 font-mono text-[11px] text-slate">
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 11l6-6 3.536 3.536-6 6H9v-3.536z" /></svg>
+                    Edited <%= h.formatDate(note.updatedAt, tz, false) %> · <%= h.formatTime(note.updatedAt, tz) %>
+                    <span class="text-ink/40">(<%= h.timeAgo(note.updatedAt, now) %>)</span>
+                  </p>
+                <% } %>
+              </div>
+            </li>
+          <% }); %>
+        </ol>
+      </section>
+    <% }); %>
+  </div>
+</div>

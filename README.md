@@ -24,9 +24,15 @@ You can access the live application at [https://notes-app-819b.onrender.com/](ht
 ## Features
 
 - Create, read, update, and delete notes
-- Archive and unarchive notes
-- Search functionality
-- Static file serving
+- Board view and Timeline view (notes grouped by Today, Yesterday, This week and month, with a "jump to" list)
+- Pin important notes to the top
+- Tags with one-click tag filters
+- Tickable checklists (start a line with `[ ]`)
+- Undo delete: deleted notes go to a bin for 30 days and can be restored from the "Undo" message
+- Sort by newest, oldest, recently edited or A to Z
+- Archive and unarchive notes, optionally including archived notes in search and views
+- Search across titles, text and tags with highlighted matches
+- Keyboard shortcuts: `N` new note, `/` search, `B` board, `T` timeline, `Esc` close
 
 ## Prerequisites
 
@@ -54,6 +60,8 @@ node server.js
 ~~~
 
 4. Open your web browser and navigate to `http://localhost:3000`
+
+The first time the app starts with no notes, it loads a set of sample notes (including a few archived ones) so every feature can be tried right away. Run `npm run seed` at any time to wipe all notes (including the bin) and reload the samples.
 
 ## API Endpoints
 

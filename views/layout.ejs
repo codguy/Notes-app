@@ -4,10 +4,115 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title><%= title %> - Notes App</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
         <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            display: ['"Bricolage Grotesque"', 'system-ui', 'sans-serif'],
+                            sans: ['"Instrument Sans"', 'system-ui', 'sans-serif'],
+                            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+                        },
+                        colors: {
+                            desk: '#E6ECF1',
+                            ink: '#1B2A3A',
+                            // Adds `text-slate` without replacing the built-in slate-100…900 shades
+                            slate: { DEFAULT: '#5B6B7C' },
+                            pen: '#2F5BEA',
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            /* Card tints — one per note colour */
+            .tint-sky    { --tint: #D6E4F0; --edge: #A9C3DB; }
+            .tint-sage   { --tint: #DCE8D3; --edge: #AFC9A0; }
+            .tint-butter { --tint: #F4E8C1; --edge: #DDC680; }
+            .tint-rose   { --tint: #F2DAD6; --edge: #DDAAA2; }
+            .tint-lilac  { --tint: #E3DDF0; --edge: #B9ADD6; }
+            .tint-paper  { --tint: #FBFCFD; --edge: #CDD6DF; }
+
+            body {
+                background-color: #E6ECF1;
+                background-image: radial-gradient(rgba(27, 42, 58, 0.07) 1px, transparent 1px);
+                background-size: 22px 22px;
+            }
+
+            /* Masonry board */
+            .board { column-gap: 1.5rem; }
+            .board > * { break-inside: avoid; margin-bottom: 1.5rem; }
+
+            /* Signature: index cards resting slightly off-square, settling flat on hover */
+            .note-card {
+                background: var(--tint);
+                border: 1px solid var(--edge);
+                box-shadow: 0 1px 0 var(--edge), 0 10px 24px -14px rgba(27, 42, 58, 0.35);
+                transform: rotate(var(--tilt, 0deg));
+                transition: transform 180ms ease, box-shadow 180ms ease;
+            }
+            .note-card:hover,
+            .note-card:focus-within {
+                transform: rotate(0deg) translateY(-3px);
+                box-shadow: 0 1px 0 var(--edge), 0 18px 32px -16px rgba(27, 42, 58, 0.45);
+            }
+            .note-card .card-actions { opacity: 0; transition: opacity 150ms ease; }
+            .note-card:hover .card-actions,
+            .note-card:focus-within .card-actions { opacity: 1; }
+            @media (hover: none) { .note-card .card-actions { opacity: 1; } }
+
+            .note-card.is-archived { opacity: 0.65; }
+            .note-card.is-archived:hover { opacity: 1; }
+
+            /* Timeline: one rail running down the page with a coloured dot per note */
+            .timeline::before {
+                content: '';
+                position: absolute;
+                top: 0.5rem;
+                bottom: 0;
+                left: calc(5.5rem + 5px);
+                width: 2px;
+                background: linear-gradient(to bottom, rgba(27, 42, 58, 0.18), rgba(27, 42, 58, 0.05));
+            }
+            @media (min-width: 640px) { .timeline::before { left: calc(7.5rem + 5px); } }
+            .timeline-dot {
+                position: absolute;
+                left: 0;
+                top: 1.45rem;
+                width: 12px;
+                height: 12px;
+                border-radius: 9999px;
+                background: var(--dot);
+                box-shadow: 0 0 0 3px #E6ECF1;
+            }
+
+            mark.highlight {
+                background: #FFE27A;
+                color: inherit;
+                padding: 0 2px;
+                border-radius: 3px;
+            }
+
+            .swatch input:checked + span { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #2F5BEA; }
+            .swatch input:focus-visible + span { outline: 2px solid #2F5BEA; outline-offset: 4px; }
+
+            :focus-visible { outline: 2px solid #2F5BEA; outline-offset: 2px; }
+
+            .drawer { transition: transform 220ms ease; }
+            .toast { transition: opacity 200ms ease, transform 200ms ease; }
+
+            @media (prefers-reduced-motion: reduce) {
+                .note-card, .drawer, .toast, .card-actions { transition: none !important; }
+                .note-card, .note-card:hover { transform: none !important; }
+            }
+        </style>
     </head>
-    <body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
-        <main class="flex-grow container mx-auto p-4">
+    <body class="text-ink font-sans min-h-screen flex flex-col antialiased">
+        <main class="flex-grow w-full">
             <%- body %>
         </main>
     </body>

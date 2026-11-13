@@ -1,0 +1,27 @@
+<%
+  // Board view: pinned notes first, then the rest, then archived notes (when shown).
+  const tilts = ['-0.8deg', '0.5deg', '-0.3deg', '0.9deg', '-0.6deg', '0.3deg'];
+  const sorted = h.sortNotes(notes, prefs.sort);
+  const sections = [
+    { label: 'Pinned', notes: sorted.filter(n => !n.archived && n.pinned) },
+    { label: 'Notes', notes: sorted.filter(n => !n.archived && !n.pinned) },
+    { label: 'Archived', notes: sorted.filter(n => n.archived) },
+  ].filter(section => section.notes.length);
+  const showLabels = sections.length > 1;
+  let index = 0;
+%>
+<% sections.forEach(function(section) { %>
+  <section class="mb-6">
+    <% if (showLabels) { %>
+      <h2 class="mb-4 flex items-center gap-3 font-mono text-xs uppercase tracking-wider text-slate">
+        <%= section.label %> <span class="text-ink/40"><%= section.notes.length %></span>
+        <span class="h-px flex-1 bg-ink/10"></span>
+      </h2>
+    <% } %>
+    <div class="board columns-1 sm:columns-2 lg:columns-3">
+      <% section.notes.forEach(function(note) { %>
+        <%- include('card.ejs', { note: note, variant: 'board', tilt: tilts[index++ % tilts.length] }) %>
+      <% }); %>
+    </div>
+  </section>
+<% }); %>
